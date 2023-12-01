@@ -2,21 +2,22 @@
 
 #pragma once
 
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 
-#include "GamePawn.generated.h"
+#include "GCCCharacter.generated.h"
 
-class UObject;
+class UCharacterDataComponent;
+
 
 /** 
  * Minimal class that supports extension by game feature plugins 
  */
 UCLASS(Blueprintable)
-class GCCORE_API AGamePawn : public APawn
+class GCCORE_API AGCCCharacter : public ACharacter
 {
 	GENERATED_BODY()
 public:
-	AGamePawn(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AGCCCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	//
@@ -29,7 +30,7 @@ protected:
 	/**
 	 * Callback function to inform completion of initialization of CharacterData
 	 */
-	virtual void OnCharacterDataInitialized()
+	virtual void OnCharacterDataInitialized() 
 	{
 		BP_OnCharacterDataInitialized();
 	}

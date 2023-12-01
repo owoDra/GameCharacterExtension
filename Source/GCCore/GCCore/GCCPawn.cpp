@@ -1,15 +1,15 @@
 // Copyright (C) 2023 owoDra
 
-#include "GameCharacter.h"
+#include "GCCPawn.h"
 
 #include "CharacterDataComponent.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(GameCharacter)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GCCPawn)
 
 
-AGameCharacter::AGameCharacter(const FObjectInitializer& ObjectInitializer)
+AGCCPawn::AGCCPawn(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	CharacterDataComponent = CreateDefaultSubobject<UCharacterDataComponent>(TEXT("CharacterDataComponent"));
@@ -17,24 +17,23 @@ AGameCharacter::AGameCharacter(const FObjectInitializer& ObjectInitializer)
 }
 
 
-void AGameCharacter::PreInitializeComponents()
+void AGCCPawn::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
 	UGameFrameworkComponentManager::AddGameFrameworkComponentReceiver(this);
 }
 
-void AGameCharacter::BeginPlay()
+void AGCCPawn::BeginPlay()
 {
 	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(this, UGameFrameworkComponentManager::NAME_GameActorReady);
 
 	Super::BeginPlay();
 }
 
-void AGameCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AGCCPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	UGameFrameworkComponentManager::RemoveGameFrameworkComponentReceiver(this);
 
 	Super::EndPlay(EndPlayReason);
 }
-

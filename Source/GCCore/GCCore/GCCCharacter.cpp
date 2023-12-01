@@ -1,15 +1,15 @@
 // Copyright (C) 2023 owoDra
 
-#include "GamePawn.h"
+#include "GCCCharacter.h"
 
 #include "CharacterDataComponent.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(GamePawn)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GCCCharacter)
 
 
-AGamePawn::AGamePawn(const FObjectInitializer& ObjectInitializer)
+AGCCCharacter::AGCCCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	CharacterDataComponent = CreateDefaultSubobject<UCharacterDataComponent>(TEXT("CharacterDataComponent"));
@@ -17,23 +17,24 @@ AGamePawn::AGamePawn(const FObjectInitializer& ObjectInitializer)
 }
 
 
-void AGamePawn::PreInitializeComponents()
+void AGCCCharacter::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
 	UGameFrameworkComponentManager::AddGameFrameworkComponentReceiver(this);
 }
 
-void AGamePawn::BeginPlay()
+void AGCCCharacter::BeginPlay()
 {
 	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent(this, UGameFrameworkComponentManager::NAME_GameActorReady);
 
 	Super::BeginPlay();
 }
 
-void AGamePawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AGCCCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	UGameFrameworkComponentManager::RemoveGameFrameworkComponentReceiver(this);
 
 	Super::EndPlay(EndPlayReason);
 }
+
