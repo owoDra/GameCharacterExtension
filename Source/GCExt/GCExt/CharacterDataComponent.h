@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Components/PawnComponent.h"
+#include "InitStateComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 
 #include "CharacterModifierContainer.h"
@@ -25,9 +25,7 @@ class UCharacterData;
  *	but by PlayerState, etc.
  */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class GCCORE_API UCharacterDataComponent
-	: public UPawnComponent
-	, public IGameFrameworkInitStateInterface
+class GCEXT_API UCharacterDataComponent : public UInitStateComponent
 {
 	GENERATED_BODY()
 public:
@@ -35,19 +33,12 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	//
-	// Function name used to add this component
-	//
-	static const FName NAME_ActorFeatureName;
-
-
 protected:
 	virtual void OnRegister() override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
 	virtual bool CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const override;
 	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
 	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
@@ -98,5 +89,21 @@ public:
 	 * Register a callback to inform completion of initialization of CharacterData
 	 */
 	void OnCharacterDataInitialized_Register(FSimpleMulticastDelegate::FDelegate Delegate);
+
+
+public:
+	template <class T>
+	T* GetPawn() const
+	{
+		static_assert(TPointerIsConvertibleFromTo<T, APawn>::Value, "'T' template parameter to GetPawn must be derived from APawn");
+		return Cast<T>(GetOwner());
+	}
+
+	template <class T>
+	T* GetPawnChecked() const
+	{
+		static_assert(TPointerIsConvertibleFromTo<T, APawn>::Value, "'T' template parameter to GetPawnChecked must be derived from APawn");
+		return CastChecked<T>(GetOwner());
+	}
 
 };

@@ -2,7 +2,7 @@
 
 #include "CharacterModifier_AddComponent.h"
 
-#include "GCCoreLogs.h"
+#include "GCExtLogs.h"
 
 #include "GameFramework/Pawn.h"
 #include "Net/UnrealNetwork.h"
@@ -29,7 +29,7 @@ void UCharacterModifierInstance_AddComponent::OnApply(const UCharacterModifier* 
 		const auto bIsServer{ NetMode != NM_Client };
 		const auto bIsClient{ NetMode != NM_DedicatedServer };
 
-		UE_LOG(LogGCC, Log, TEXT("Adding components for %s to world %s (Client: %d, Server: %d)"), *GetPathNameSafe(Pawn), *World->GetDebugDisplayName(), bIsClient ? 1 : 0, bIsServer ? 1 : 0);
+		UE_LOG(LogGCE, Log, TEXT("Adding components for %s to world %s (Client: %d, Server: %d)"), *GetPathNameSafe(Pawn), *World->GetDebugDisplayName(), bIsClient ? 1 : 0, bIsServer ? 1 : 0);
 
 		const auto* Modifier{ CastChecked<UCharacterModifier_AddComponent>(Data) };
 		const auto ComponentSoftClass{ Modifier->ComponentClass };
@@ -39,7 +39,7 @@ void UCharacterModifierInstance_AddComponent::OnApply(const UCharacterModifier* 
 		{
 			auto* ComponentClass{ ComponentSoftClass.LoadSynchronous() };
 
-			UE_LOG(LogGCC, Log, TEXT("+Component (Name: %s)"), *GetNameSafe(ComponentClass));
+			UE_LOG(LogGCE, Log, TEXT("+Component (Name: %s)"), *GetNameSafe(ComponentClass));
 
 			DynamicComponent = NewObject<UActorComponent>(Pawn, ComponentClass);
 			SetupComponent(DynamicComponent);

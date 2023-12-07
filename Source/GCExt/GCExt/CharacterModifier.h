@@ -11,7 +11,7 @@ class UCharacterModifierInstance;
  * Base class for setting changes to the character to be applied during character setup
  */
 UCLASS(DefaultToInstanced, EditInlineNew, Abstract)
-class GCCORE_API UCharacterModifier : public UObject
+class GCEXT_API UCharacterModifier : public UObject
 {
 	GENERATED_BODY()
 public:

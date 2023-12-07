@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class GCCore : ModuleRules
+public class GCExt : ModuleRules
 {
-	public GCCore(ReadOnlyTargetRules Target) : base(Target)
+	public GCExt(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -12,7 +12,7 @@ public class GCCore : ModuleRules
             new string[]
             {
                 ModuleDirectory,
-                ModuleDirectory + "/GCCore",
+                ModuleDirectory + "/GCExt",
             }
         );
 
@@ -33,6 +33,7 @@ public class GCCore : ModuleRules
             new string[]
             {
                 "NetCore",
+                "GFCore",
             }
         );
 

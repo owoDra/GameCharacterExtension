@@ -7,7 +7,7 @@
 /**
  *  Modules for the main features of the GameCharacterCore plugin
  */
-class FGCCoreModule : public IModuleInterface
+class FGCExtModule : public IModuleInterface
 {
 public:
 	virtual void StartupModule() override;

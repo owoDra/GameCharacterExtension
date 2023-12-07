@@ -5,7 +5,8 @@
 #include "CharacterData.h"
 #include "CharacterModifier.h"
 #include "CharacterModifierInstance.h"
-#include "CharacterInitStateTags.h"
+
+#include "InitStateTags.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 #include "Net/UnrealNetwork.h"
@@ -13,8 +14,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CharacterDataComponent)
 
-
-const FName UCharacterDataComponent::NAME_ActorFeatureName("CharacterData");
 
 UCharacterDataComponent::UCharacterDataComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -261,10 +260,10 @@ void UCharacterDataComponent::UpdateCharacterData()
 {
 	check(CharacterData);
 
-	if (HasAuthority())
-	{
-		auto* Pawn{ GetPawnChecked<APawn>() };
+	auto* Pawn{ GetPawnChecked<APawn>() };
 
+	if (Pawn->HasAuthority())
+	{
 		if (!ModifierContainer.Entries.IsEmpty())
 		{
 			ModifierContainer.RemoveAllEntries(Pawn);
@@ -285,7 +284,9 @@ void UCharacterDataComponent::UpdateCharacterData()
 
 void UCharacterDataComponent::SetCharacterData(const UCharacterData* NewCharacterData)
 {
-	if (HasAuthority())
+	auto* Pawn{ GetPawnChecked<APawn>() };
+
+	if (Pawn->HasAuthority())
 	{
 		if (NewCharacterData != CharacterData)
 		{

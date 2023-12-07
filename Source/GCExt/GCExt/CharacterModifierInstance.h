@@ -13,7 +13,7 @@ class UCharacterDataComponent;
  * Base class that holds data on changes applied during character setup
  */
 UCLASS(Abstract)
-class GCCORE_API UCharacterModifierInstance : public UObject
+class GCEXT_API UCharacterModifierInstance : public UObject
 {
 	GENERATED_BODY()
 public:

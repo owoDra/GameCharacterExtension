@@ -14,7 +14,7 @@ class UActorComponent;
  * Modifier Instance class to add components to Pawn
  */
 UCLASS()
-class GCCORE_API UCharacterModifierInstance_AddComponent : public UCharacterModifierInstance
+class GCEXT_API UCharacterModifierInstance_AddComponent : public UCharacterModifierInstance
 {
 	GENERATED_BODY()
 
@@ -47,7 +47,7 @@ protected:
  * Modifier class to add components to Pawn
  */
 UCLASS(meta = (DisplayName = "CM Add Component"))
-class GCCORE_API UCharacterModifier_AddComponent : public UCharacterModifier
+class GCEXT_API UCharacterModifier_AddComponent : public UCharacterModifier
 {
 	GENERATED_BODY()
 
