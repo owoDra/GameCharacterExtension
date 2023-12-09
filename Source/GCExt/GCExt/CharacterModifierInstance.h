@@ -32,4 +32,20 @@ public:
 	 */
 	virtual void OnRemoval(APawn* Pawn) PURE_VIRTUAL(, );
 
+
+public:
+	template <class T>
+	T* GetPawn() const
+	{
+		static_assert(TPointerIsConvertibleFromTo<T, APawn>::Value, "'T' template parameter to GetPawn must be derived from APawn");
+		return Cast<T>(GetOuter());
+	}
+
+	template <class T>
+	T* GetPawnChecked() const
+	{
+		static_assert(TPointerIsConvertibleFromTo<T, APawn>::Value, "'T' template parameter to GetPawn must be derived from APawn");
+		return CastChecked<T>(GetOuter());
+	}
+
 };

@@ -5,6 +5,7 @@
 #include "CharacterData.h"
 #include "CharacterModifier.h"
 #include "CharacterModifierInstance.h"
+#include "GCExtLogs.h"
 
 #include "InitStateTags.h"
 
@@ -174,9 +175,9 @@ void UCharacterDataComponent::OnActorInitStateChanged(const FActorInitStateChang
 		 */
 		if (Params.FeatureState == TAG_InitState_Spawned)
 		{
-			ensure(TryToChangeInitState(TAG_InitState_DataAvailable));
+			//(TryToChangeInitState(TAG_InitState_DataAvailable));
 
-			CheckDefaultInitialization();
+			//CheckDefaultInitialization();
 		}
 
 		/**
@@ -202,6 +203,8 @@ void UCharacterDataComponent::CheckDefaultInitialization()
 	// Perform initialization state checks on other features before checking the initialization state of this component
 
 	CheckDefaultInitializationForImplementers();
+
+	// @TODO: Allow changes from DeveloperSetting
 
 	static const TArray<FGameplayTag> StateChain
 	{

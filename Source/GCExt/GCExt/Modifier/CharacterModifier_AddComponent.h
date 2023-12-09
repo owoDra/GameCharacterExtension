@@ -21,13 +21,7 @@ class GCEXT_API UCharacterModifierInstance_AddComponent : public UCharacterModif
 public:
 	UCharacterModifierInstance_AddComponent() {}
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 protected:
-	//
-	// Dynamically added component
-	//
-	UPROPERTY(Replicated)
 	TObjectPtr<UActorComponent> DynamicComponent;
 
 public:
@@ -38,7 +32,40 @@ protected:
 	//
 	// Used to set initial values for created components
 	//
-	virtual void SetupComponent(UActorComponent* Compoenent) {}
+	virtual void SetupComponent(UActorComponent* Compoenent, const UCharacterModifier* Data, APawn* Pawn) {}
+
+	//
+	// Used to deinitialize values for created components
+	//
+	virtual void FinalizeComponent(UActorComponent* Compoenent, APawn* Pawn) {}
+
+};
+
+
+/**
+ * Base Modifier class to add components to Pawn
+ */
+UCLASS(Abstract)
+class GCEXT_API UCharacterModifier_AddComponentBase : public UCharacterModifier
+{
+	GENERATED_BODY()
+
+	friend class UCharacterModifierInstance_AddComponent;
+
+public:
+	UCharacterModifier_AddComponentBase() {}
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "ComponentToAdd")
+	bool bAddToClient{ true };
+
+	UPROPERTY(EditDefaultsOnly, Category = "ComponentToAdd")
+	bool bAddToServer{ true };
+
+protected:
+	virtual UClass* GetInstanceClass() const override;
+
+	virtual UClass* GetComponentClass() const PURE_VIRTUAL(, return nullptr;);
 
 };
 
@@ -47,7 +74,7 @@ protected:
  * Modifier class to add components to Pawn
  */
 UCLASS(meta = (DisplayName = "CM Add Component"))
-class GCEXT_API UCharacterModifier_AddComponent : public UCharacterModifier
+class UCharacterModifier_AddComponent final : public UCharacterModifier_AddComponentBase
 {
 	GENERATED_BODY()
 
@@ -60,13 +87,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "ComponentToAdd")
 	TSoftClassPtr<UActorComponent> ComponentClass{ nullptr };
 
-	UPROPERTY(EditDefaultsOnly, Category = "ComponentToAdd")
-	bool bAddToClient{ true };
-
-	UPROPERTY(EditDefaultsOnly, Category = "ComponentToAdd")
-	bool bAddToServer{ true };
-
 protected:
-	virtual UClass* GetInstanceClass() const override;
+	virtual UClass* GetComponentClass() const override;
 
 };
