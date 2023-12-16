@@ -63,7 +63,7 @@ protected:
 
 protected:
 	UFUNCTION()
-	virtual void OnRep_CharacterData();
+	virtual void OnRep_CharacterData(const UCharacterData* OldData);
 
 	/**
 	 * Set the current character data

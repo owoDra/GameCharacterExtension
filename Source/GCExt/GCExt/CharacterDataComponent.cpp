@@ -254,8 +254,10 @@ void UCharacterDataComponent::ReadyForReplication()
 }
 
 
-void UCharacterDataComponent::OnRep_CharacterData()
+void UCharacterDataComponent::OnRep_CharacterData(const UCharacterData* OldData)
 {
+	UE_LOG(LogGCE, Log, TEXT("OldCharacterData: %s"), *GetNameSafe(OldData));
+
 	UpdateCharacterData();
 }
 
