@@ -4,7 +4,6 @@
 
 #include "CharacterData.h"
 #include "CharacterModifier.h"
-#include "CharacterModifierInstance.h"
 #include "GCExtLogs.h"
 
 #include "InitStateTags.h"
@@ -18,7 +17,6 @@
 
 UCharacterDataComponent::UCharacterDataComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, ModifierContainer(this)
 {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 	PrimaryComponentTick.bCanEverTick = false;
@@ -30,7 +28,6 @@ void UCharacterDataComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, ModifierContainer);
 	DOREPLIFETIME(ThisClass, CharacterData);
 }
 
@@ -89,7 +86,6 @@ bool UCharacterDataComponent::CanChangeInitState(UGameFrameworkComponentManager*
 
 	/**
 	 * [None] -> [Spawned]
-	 * 
 	 */
 	if (!CurrentState.IsValid() && DesiredState == TAG_InitState_Spawned)
 	{
@@ -103,15 +99,8 @@ bool UCharacterDataComponent::CanChangeInitState(UGameFrameworkComponentManager*
 
 	/**
 	 * [Spawned] -> [DataAvailable]
-	 * 
-	 * Tips:
-	 *	At any time that the current state is valid (Spawned or later), 
-	 *	an attempt can be made to move to this state.
-	 * 
-	 *  When CharacterData is changed or a new feature is added to Character later,
-	 *	it is moved to this state to reset the initialization state.
 	 */
-	if (CurrentState.IsValid() && DesiredState == TAG_InitState_DataAvailable)
+	if (CurrentState == TAG_InitState_Spawned && DesiredState == TAG_InitState_DataAvailable)
 	{
 		// Check CharacterData
 		// CharacterData is always required for character initialization
@@ -164,26 +153,9 @@ void UCharacterDataComponent::OnActorInitStateChanged(const FActorInitStateChang
 	if (Params.FeatureName != NAME_ActorFeatureName)
 	{
 		/**
-		 * -> [Spawned]
-		 * 
-		 * Tips:
-		 *	Rewind the initialization state of this component to [DataAvailable] 
-		 *	when other functions reach [Spawned]
-		 * 
-		 *  To be able to understand the initialization state of 
-		 *	the entire Pawn features through this component.
-		 */
-		if (Params.FeatureState == TAG_InitState_Spawned)
-		{
-			//(TryToChangeInitState(TAG_InitState_DataAvailable));
-
-			//CheckDefaultInitialization();
-		}
-
-		/**
 		 * -> [DataInitialized]
 		 */
-		else if (Params.FeatureState == TAG_InitState_DataInitialized)
+		if (Params.FeatureState == TAG_InitState_DataInitialized)
 		{
 			CheckDefaultInitialization();
 		}
@@ -218,71 +190,9 @@ void UCharacterDataComponent::CheckDefaultInitialization()
 }
 
 
-bool UCharacterDataComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
-{
-	auto bWroteSomething{ Super::ReplicateSubobjects(Channel, Bunch, RepFlags) };
-
-	for (const auto& Entry : ModifierContainer.Entries)
-	{
-		const auto& Instance{ Entry.Instance };
-
-		if (Instance)
-		{
-			bWroteSomething |= Channel->ReplicateSubobject(Instance, *Bunch, *RepFlags);
-		}
-	}
-
-	return bWroteSomething;
-}
-
-void UCharacterDataComponent::ReadyForReplication()
-{
-	Super::ReadyForReplication();
-
-	if (IsUsingRegisteredSubObjectList())
-	{
-		for (const auto& Entry : ModifierContainer.Entries)
-		{
-			const auto& Instance{ Entry.Instance };
-
-			if (Instance)
-			{
-				AddReplicatedSubObject(Instance);
-			}
-		}
-	}
-}
-
-
-void UCharacterDataComponent::OnRep_CharacterData(const UCharacterData* OldData)
-{
-	UE_LOG(LogGCE, Log, TEXT("OldCharacterData: %s"), *GetNameSafe(OldData));
-
-	UpdateCharacterData();
-}
-
-void UCharacterDataComponent::UpdateCharacterData()
+void UCharacterDataComponent::OnRep_CharacterData()
 {
 	check(CharacterData);
-
-	auto* Pawn{ GetPawnChecked<APawn>() };
-
-	if (Pawn->HasAuthority())
-	{
-		if (!ModifierContainer.Entries.IsEmpty())
-		{
-			ModifierContainer.RemoveAllEntries(Pawn);
-		}
-
-		auto ModifiersToApply{ TArray<UCharacterModifier*>() };
-		CharacterData->GetModifiers(ModifiersToApply);
-		for (const auto& Modifier : ModifiersToApply)
-		{
-			ModifierContainer.AddEntry(Modifier, Pawn);
-		}
-	}
-
-	ensure(TryToChangeInitState(TAG_InitState_DataAvailable));
 
 	CheckDefaultInitialization();
 }
@@ -291,13 +201,24 @@ void UCharacterDataComponent::SetCharacterData(const UCharacterData* NewCharacte
 {
 	auto* Pawn{ GetPawnChecked<APawn>() };
 
+	// Do nothing if CharacterData is already set
+
+	if (CharacterData)
+	{
+		return;
+	}
+
+	// Set CharacterData
+
 	if (Pawn->HasAuthority())
 	{
-		if (NewCharacterData != CharacterData)
+		if (ensure(NewCharacterData))
 		{
 			CharacterData = NewCharacterData;
 
-			UpdateCharacterData();
+			CharacterData->ApplyModifiers(Pawn);
+
+			CheckDefaultInitialization();
 		}
 	}
 }

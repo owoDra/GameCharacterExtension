@@ -7,6 +7,7 @@
 #include "CharacterModifierSet.generated.h"
 
 class UCharacterModifier;
+class APawn;
 
 
 /**
@@ -34,8 +35,8 @@ protected:
 
 public:
 	/**
-	 * Return Modifiers
+	 * Apply Modifiers
 	 */
-	const TArray<UCharacterModifier*>& GetModifiers() const { return Modifiers; }
+	void ApplyModifiers(APawn* Pawn) const;
 
 };

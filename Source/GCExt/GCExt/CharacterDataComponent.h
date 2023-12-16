@@ -5,8 +5,6 @@
 #include "InitStateComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 
-#include "CharacterModifierContainer.h"
-
 #include "Delegates/Delegate.h"
 
 #include "CharacterDataComponent.generated.h"
@@ -44,10 +42,6 @@ public:
 	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
 	virtual void CheckDefaultInitialization() override;
 
-public:
-	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
-	virtual void ReadyForReplication() override;
-
 protected:
 	//
 	// Data used to spawn Character operated by players or AI
@@ -55,20 +49,9 @@ protected:
 	UPROPERTY(ReplicatedUsing = "OnRep_CharacterData")
 	TObjectPtr<const UCharacterData> CharacterData;
 
-	//
-	// List of CharacterModifierInstance currently applied to Pawn or Character
-	//
-	UPROPERTY(Replicated)
-	FCharacterModifierContainer ModifierContainer;
-
 protected:
 	UFUNCTION()
-	virtual void OnRep_CharacterData(const UCharacterData* OldData);
-
-	/**
-	 * Set the current character data
-	 */
-	virtual void UpdateCharacterData();
+	virtual void OnRep_CharacterData();
 
 public:
 	/**
