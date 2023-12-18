@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "InitStateComponent.h"
+#include "InitState/InitStateComponent.h"
 #include "Components/GameFrameworkInitStateInterface.h"
 
 #include "Delegates/Delegate.h"

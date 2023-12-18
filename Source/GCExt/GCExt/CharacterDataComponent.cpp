@@ -6,7 +6,7 @@
 #include "CharacterModifier.h"
 #include "GCExtLogs.h"
 
-#include "InitStateTags.h"
+#include "InitState/InitStateTags.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 #include "Net/UnrealNetwork.h"
