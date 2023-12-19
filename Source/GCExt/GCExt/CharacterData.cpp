@@ -13,14 +13,22 @@ UCharacterData::UCharacterData(const FObjectInitializer& ObjectInitializer)
 {
 }
 
-void UCharacterData::GetModifiers(TArray<UCharacterModifier*>& OutArray) const
-{
-	OutArray.Empty();
 
+void UCharacterData::ApplyModifiers(APawn* Pawn) const
+{
 	for (const auto& ModifierSet : ModifierSets)
 	{
-		OutArray.Append(ModifierSet->GetModifiers());
+		if (ensure(ModifierSet))
+		{
+			ModifierSet->ApplyModifiers(Pawn);
+		}
 	}
 
-	OutArray.Append(Modifiers);
+	for (const auto& Modifier : Modifiers)
+	{
+		if (ensure(Modifier))
+		{
+			Modifier->OnApply(Pawn);
+		}
+	}
 }

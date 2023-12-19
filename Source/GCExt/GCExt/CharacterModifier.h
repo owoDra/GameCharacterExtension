@@ -5,7 +5,6 @@
 #include "CharacterModifier.generated.h"
 
 class APawn;
-class UCharacterModifierInstance;
 
 /**
  * Base class for setting changes to the character to be applied during character setup
@@ -21,12 +20,6 @@ public:
 	/**
 	 * Executed when CharacterData is applied
 	 */
-	 UCharacterModifierInstance* CreateModifier(APawn* Pawn);
-
-protected:
-	/**
-	 * return modifier class
-	 */
-	virtual UClass* GetInstanceClass() const PURE_VIRTUAL(, return nullptr;);
+	virtual void OnApply(APawn* Pawn) const PURE_VIRTUAL(, );
 
 };

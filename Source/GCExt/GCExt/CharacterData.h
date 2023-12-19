@@ -8,6 +8,7 @@
 
 class UCharacterModifier;
 class UCharacterModifierSet;
+class APawn;
 
 
 /**
@@ -49,8 +50,8 @@ protected:
 
 public:
 	/**
-	 * Return Modifiers
+	 * Apply Modifiers
 	 */
-	void GetModifiers(TArray<UCharacterModifier*>& OutArray) const;
+	void ApplyModifiers(APawn* Pawn) const;
 
 };
