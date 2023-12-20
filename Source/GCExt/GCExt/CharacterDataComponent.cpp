@@ -39,13 +39,13 @@ void UCharacterDataComponent::OnRegister()
 	// This component can only be added to classes derived from APawn
 
 	const auto* Pawn{ GetPawn<APawn>() };
-	ensureAlwaysMsgf((Pawn != nullptr), TEXT("BEPawnBasicComponent on [%s] can only be added to Pawn actors."), *GetNameSafe(GetOwner()));
+	ensureAlwaysMsgf((Pawn != nullptr), TEXT("CharacterDataComponent on [%s] can only be added to Pawn actors."), *GetNameSafe(GetOwner()));
 
 	// No more than two of these components should be added to a Pawn.
 
 	TArray<UActorComponent*> Components;
 	Pawn->GetComponents(UCharacterDataComponent::StaticClass(), Components);
-	ensureAlwaysMsgf((Components.Num() == 1), TEXT("Only one BEPawnBasicComponent should exist on [%s]."), *GetNameSafe(GetOwner()));
+	ensureAlwaysMsgf((Components.Num() == 1), TEXT("Only one CharacterDataComponent should exist on [%s]."), *GetNameSafe(GetOwner()));
 
 	// Register this component in the GameFrameworkComponentManager.
 
