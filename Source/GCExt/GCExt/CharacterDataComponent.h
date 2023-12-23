@@ -33,14 +33,9 @@ public:
 
 protected:
 	virtual void OnRegister() override;
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-public:
-	virtual bool CanChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) const override;
-	virtual void HandleChangeInitState(UGameFrameworkComponentManager* Manager, FGameplayTag CurrentState, FGameplayTag DesiredState) override;
-	virtual void OnActorInitStateChanged(const FActorInitStateChangedParams& Params) override;
-	virtual void CheckDefaultInitialization() override;
+	virtual bool CanChangeInitStateToDataAvailable(UGameFrameworkComponentManager* Manager) const override;
+
 
 protected:
 	//
@@ -59,19 +54,6 @@ public:
 	 */
 	UFUNCTION(BlueprintAuthorityOnly, BlueprintCallable)
 	void SetCharacterData(const UCharacterData* NewCharacterData);
-
-
-protected:
-	//
-	// Delegate notifying that CharacterData has been applied and the initialization process has been completed.
-	//
-	FSimpleMulticastDelegate OnCharacterDataInitializedDelegate;
-
-public:
-	/**
-	 * Register a callback to inform completion of initialization of CharacterData
-	 */
-	void OnCharacterDataInitialized_Register(FSimpleMulticastDelegate::FDelegate Delegate);
 
 
 public:

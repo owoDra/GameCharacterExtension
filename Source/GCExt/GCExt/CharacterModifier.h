@@ -16,10 +16,16 @@ class GCEXT_API UCharacterModifier : public UObject
 public:
 	UCharacterModifier() {}
 
+protected:
+	bool bApplyOnServer{ true };
+	bool bApplyOnClient{ true };
+
+	bool bOnlyApplyOnLocal{ false };
+
 public:
 	/**
 	 * Executed when CharacterData is applied
 	 */
-	virtual void OnApply(APawn* Pawn) const PURE_VIRTUAL(, );
+	virtual bool OnApply(APawn* Pawn) const;
 
 };
