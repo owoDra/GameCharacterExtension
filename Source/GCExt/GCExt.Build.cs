@@ -1,4 +1,4 @@
-// Copyright (C) 2023 owoDra
+﻿// Copyright (C) 2023 owoDra
 
 using UnrealBuildTool;
 
@@ -25,6 +25,7 @@ public class GCExt : ModuleRules
                 "Engine",
                 "ModularGameplay",
                 "GameplayTags",
+                "GameFeatures",
             }
         );
 

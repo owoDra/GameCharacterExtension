@@ -30,23 +30,64 @@ bool UCharacterModifier_SetMesh::OnApply(APawn* Pawn) const
 		{
 			if (auto* Mesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, MeshToSet.MeshTag) })
 			{
-				auto* LoadedSkeltalMesh
+				UE_LOG(LogGCE, Log, TEXT("+Modify Mesh (Name: %s)"), *GetNameSafe(Mesh));
+
+				// Change Mesh
+
+				if (MeshToSet.bShouldChangeMesh)
 				{
-					MeshToSet.SkeletalMesh.IsNull() ? nullptr :
-					MeshToSet.SkeletalMesh.IsValid() ? MeshToSet.SkeletalMesh.Get() : MeshToSet.SkeletalMesh.LoadSynchronous()
-				};
+					auto* LoadedSkeltalMesh
+					{
+						MeshToSet.SkeletalMesh.IsNull() ? nullptr :
+						MeshToSet.SkeletalMesh.IsValid() ? MeshToSet.SkeletalMesh.Get() : MeshToSet.SkeletalMesh.LoadSynchronous()
+					};
 
-				auto* LoadedAnimInstanceClass
+					UE_LOG(LogGCE, Log, TEXT("++SkeltalMesh (Name: %s)"), *GetNameSafe(LoadedSkeltalMesh));
+
+					Mesh->SetSkeletalMesh(LoadedSkeltalMesh);
+				}
+
+				// Change AnimInstance
+
+				if (MeshToSet.bShouldChangeAnimInstance)
 				{
-					MeshToSet.AnimInstance.IsNull() ? nullptr :
-					MeshToSet.AnimInstance.IsValid() ? MeshToSet.AnimInstance.Get() : MeshToSet.AnimInstance.LoadSynchronous()
-				};
+					auto* LoadedAnimInstanceClass
+					{
+						MeshToSet.AnimInstance.IsNull() ? nullptr :
+						MeshToSet.AnimInstance.IsValid() ? MeshToSet.AnimInstance.Get() : MeshToSet.AnimInstance.LoadSynchronous()
+					};
 
-				UE_LOG(LogGCE, Log, TEXT("++SkeltalMesh (Name: %s)"), *GetNameSafe(LoadedSkeltalMesh));
-				UE_LOG(LogGCE, Log, TEXT("++AnimInstance (Name: %s)"), *GetNameSafe(LoadedAnimInstanceClass));
+					UE_LOG(LogGCE, Log, TEXT("++AnimInstance (Name: %s)"), *GetNameSafe(LoadedAnimInstanceClass));
 
-				Mesh->SetSkeletalMesh(LoadedSkeltalMesh);
-				Mesh->SetAnimInstanceClass(LoadedAnimInstanceClass);
+					Mesh->SetAnimInstanceClass(LoadedAnimInstanceClass);
+				}
+
+				// Change Location
+
+				if (MeshToSet.bShouldChangeLocation)
+				{
+					UE_LOG(LogGCE, Log, TEXT("++SetLocation (%s)"), *MeshToSet.NewLocation.ToString());
+
+					Mesh->SetRelativeLocation(MeshToSet.NewLocation);
+				}
+				
+				// Change Rotation
+
+				if (MeshToSet.bShouldChangeRotation)
+				{
+					UE_LOG(LogGCE, Log, TEXT("++SetRotation (%s)"), *MeshToSet.NewRotation.ToString());
+
+					Mesh->SetRelativeRotation(MeshToSet.NewRotation);
+				}
+
+				// Change Scale
+
+				if (MeshToSet.bShouldChangeScale)
+				{
+					UE_LOG(LogGCE, Log, TEXT("++SetScale (%s)"), *MeshToSet.NewScale.ToString());
+
+					Mesh->SetRelativeScale3D(MeshToSet.NewScale);
+				}
 			}
 		}
 	}
