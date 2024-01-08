@@ -8,9 +8,10 @@
 
 #include "InitState/InitStateTags.h"
 
+#include "Net/UnrealNetwork.h"
+#include "Net/Core/PushModel/PushModel.h"
 #include "Components/GameFrameworkComponentManager.h"
 #include "GameFramework/Pawn.h"
-#include "Net/UnrealNetwork.h"
 #include "Engine/ActorChannel.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CharacterDataComponent)
@@ -29,7 +30,11 @@ void UCharacterDataComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, CharacterData);
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+	Params.Condition = COND_None;
+
+	DOREPLIFETIME_WITH_PARAMS_FAST(UCharacterDataComponent, CharacterData, Params);
 }
 
 
@@ -118,6 +123,8 @@ void UCharacterDataComponent::SetCharacterData(const UCharacterData* NewCharacte
 		if (ensure(NewCharacterData))
 		{
 			CharacterData = NewCharacterData;
+
+			MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, CharacterData, this);
 
 			CheckDefaultInitialization();
 		}
