@@ -9,6 +9,7 @@
 #include "InitState/InitStateTags.h"
 
 #include "Components/GameFrameworkComponentManager.h"
+#include "GameFramework/Pawn.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/ActorChannel.h"
 
@@ -36,25 +37,65 @@ void UCharacterDataComponent::OnRegister()
 {
 	// This component can only be added to classes derived from APawn
 
-	const auto* Pawn{ GetPawn<APawn>() };
+	auto* Pawn{ GetPawn<APawn>() };
 	ensureAlwaysMsgf((Pawn != nullptr), TEXT("CharacterDataComponent on [%s] can only be added to Pawn actors."), *GetNameSafe(GetOwner()));
+
+	if (Pawn)
+	{
+		FScriptDelegate NewDelegate;
+		NewDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(UCharacterDataComponent, OnControllerChanged));
+		Pawn->ReceiveControllerChangedDelegate.Add(NewDelegate);
+	}
 
 	Super::OnRegister();
 }
 
 bool UCharacterDataComponent::CanChangeInitStateToDataAvailable(UGameFrameworkComponentManager* Manager) const
 {
-	return (CharacterData != nullptr);
+	if (!CharacterData)
+	{
+		return false;
+	}
+
+	auto* Pawn{ GetPawnChecked<APawn>() };
+	const auto bHasAuthority{ Pawn->HasAuthority() };
+	const auto bIsLocallyControlled{ Pawn->IsLocallyControlled() };
+
+	if (bHasAuthority || bIsLocallyControlled)
+	{
+		// Check for being possessed by a controller.
+
+		if (!Pawn->GetController())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void UCharacterDataComponent::HandleChangeInitStateToDataAvailable(UGameFrameworkComponentManager* Manager)
+{
+	auto* Pawn{ GetPawnChecked<APawn>() };
+
+	CharacterData->ApplyModifiers(Pawn);
+}
+
+
+void UCharacterDataComponent::OnControllerChanged(APawn* Pawn, AController* OldController, AController* NewController)
+{
+	if (NewController)
+	{
+		CheckDefaultInitialization();
+
+		GetPawnChecked<APawn>()->ReceiveControllerChangedDelegate.RemoveAll(this);
+	}
 }
 
 
 void UCharacterDataComponent::OnRep_CharacterData()
 {
 	check(CharacterData);
-
-	auto* Pawn{ GetPawnChecked<APawn>() };
-
-	CharacterData->ApplyModifiers(Pawn);
 
 	CheckDefaultInitialization();
 }
@@ -77,8 +118,6 @@ void UCharacterDataComponent::SetCharacterData(const UCharacterData* NewCharacte
 		if (ensure(NewCharacterData))
 		{
 			CharacterData = NewCharacterData;
-
-			CharacterData->ApplyModifiers(Pawn);
 
 			CheckDefaultInitialization();
 		}

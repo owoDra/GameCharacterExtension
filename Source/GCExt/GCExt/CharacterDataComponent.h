@@ -35,6 +35,10 @@ protected:
 	virtual void OnRegister() override;
 
 	virtual bool CanChangeInitStateToDataAvailable(UGameFrameworkComponentManager* Manager) const override;
+	virtual void HandleChangeInitStateToDataAvailable(UGameFrameworkComponentManager* Manager) override;
+
+	UFUNCTION()
+	void OnControllerChanged(APawn* Pawn, AController* OldController, AController* NewController);
 
 
 protected:
