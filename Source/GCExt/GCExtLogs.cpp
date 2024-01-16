@@ -2,4 +2,4 @@
 
 #include "GCExtLogs.h"
 
-DEFINE_LOG_CATEGORY(LogGCE);
+DEFINE_LOG_CATEGORY(LogGCE_Recipes);

@@ -1,27 +1,28 @@
 ﻿// Copyright (C) 2024 owoDra
 
-#include "GameFeatureAction_AddCharacterData.h"
+#include "GameFeatureAction_AddCharacterSet.h"
 
-#include "CharacterDataComponent.h"
+#include "CharacterInitStateComponent.h"
+#include "CharacterSet.h"
 
 #include "Components/GameFrameworkComponentManager.h"
 #include "GameFramework/Pawn.h"
 
-#include UE_INLINE_GENERATED_CPP_BY_NAME(GameFeatureAction_AddCharacterData)
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GameFeatureAction_AddCharacterSet)
 
 
 #define LOCTEXT_NAMESPACE "GameFeatures"
 
 #if WITH_EDITOR
-EDataValidationResult UGameFeatureAction_AddCharacterData::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult UGameFeatureAction_AddCharacterSet::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	auto Result{ CombineDataValidationResults(Super::IsDataValid(ValidationErrors), EDataValidationResult::Valid) };
 
-	if (CharacterData.IsNull())
+	if (CharacterSet.IsNull())
 	{
 		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
 
-		ValidationErrors.Add(FText::FromString(TEXT("Null CharacterData has set.")));
+		ValidationErrors.Add(FText::FromString(TEXT("Null CharacterSet has set.")));
 	}
 
 	return Result;
@@ -29,7 +30,7 @@ EDataValidationResult UGameFeatureAction_AddCharacterData::IsDataValid(TArray<FT
 #endif
 
 
-void UGameFeatureAction_AddCharacterData::OnGameFeatureActivating(FGameFeatureActivatingContext& Context)
+void UGameFeatureAction_AddCharacterSet::OnGameFeatureActivating(FGameFeatureActivatingContext& Context)
 {
 	auto& ActiveData{ ContextData.FindOrAdd(Context) };
 
@@ -41,7 +42,7 @@ void UGameFeatureAction_AddCharacterData::OnGameFeatureActivating(FGameFeatureAc
 	Super::OnGameFeatureActivating(Context);
 }
 
-void UGameFeatureAction_AddCharacterData::OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context)
+void UGameFeatureAction_AddCharacterSet::OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context)
 {
 	Super::OnGameFeatureDeactivating(Context);
 
@@ -53,7 +54,7 @@ void UGameFeatureAction_AddCharacterData::OnGameFeatureDeactivating(FGameFeature
 	}
 }
 
-void UGameFeatureAction_AddCharacterData::AddToWorld(const FWorldContext& WorldContext, const FGameFeatureStateChangeContext& ChangeContext)
+void UGameFeatureAction_AddCharacterSet::AddToWorld(const FWorldContext& WorldContext, const FGameFeatureStateChangeContext& ChangeContext)
 {
 	auto* World{ WorldContext.World() };
 	auto GameInstance{ WorldContext.OwningGameInstance };
@@ -79,32 +80,33 @@ void UGameFeatureAction_AddCharacterData::AddToWorld(const FWorldContext& WorldC
 }
 
 
-void UGameFeatureAction_AddCharacterData::Reset(FPerContextData& ActiveData)
+void UGameFeatureAction_AddCharacterSet::Reset(FPerContextData& ActiveData)
 {
 	ActiveData.ExtensionRequestHandles.Empty();
 }
 
-void UGameFeatureAction_AddCharacterData::HandlePawnExtension(AActor* Actor, FName EventName, FGameFeatureStateChangeContext ChangeContext)
+void UGameFeatureAction_AddCharacterSet::HandlePawnExtension(AActor* Actor, FName EventName, FGameFeatureStateChangeContext ChangeContext)
 {
 	auto* AsPawn{ CastChecked<APawn>(Actor) };
 	auto& ActiveData{ ContextData.FindOrAdd(ChangeContext) };
 
 	if ((EventName == UGameFrameworkComponentManager::NAME_ExtensionAdded) || (EventName == UGameFrameworkComponentManager::NAME_GameActorReady))
 	{
-		AddCharacterDataForPawn(AsPawn, ActiveData);
+		AddCharacterSetForPawn(AsPawn, ActiveData);
 	}
 }
 
-void UGameFeatureAction_AddCharacterData::AddCharacterDataForPawn(APawn* Pawn, FPerContextData& ActiveData)
+void UGameFeatureAction_AddCharacterSet::AddCharacterSetForPawn(APawn* Pawn, FPerContextData& ActiveData)
 {
-	if (auto* Component{ Pawn->FindComponentByClass<UCharacterDataComponent>() })
+	if (auto* Component{ Pawn->FindComponentByClass<UCharacterInitStateComponent>() })
 	{
-		const auto* LoadedCharacterData
+		const auto* LoadedCharacterSet
 		{
-			CharacterData.IsValid() ? CharacterData.Get() : CharacterData.LoadSynchronous()
+			CharacterSet.IsValid() ? CharacterSet.Get() : CharacterSet.LoadSynchronous()
 		};
 
-		Component->SetCharacterData(LoadedCharacterData);
+		TArray<FPendingCharacterRecipeHandle> DummyHundles;
+		CharacterSet->AddCharacterRecipes(Component, DummyHundles);
 	}
 }
 
