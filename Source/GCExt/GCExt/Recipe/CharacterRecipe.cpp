@@ -1,6 +1,6 @@
 ﻿// Copyright (C) 2024 owoDra
 
-#include "CharacterRecipe.h"
+#include "Recipe/CharacterRecipe.h"
 
 #include "CharacterInitStateComponent.h"
 #include "GCExtLogs.h"

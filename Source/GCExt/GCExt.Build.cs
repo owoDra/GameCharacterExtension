@@ -26,6 +26,7 @@ public class GCExt : ModuleRules
                 "ModularGameplay",
                 "GameplayTags",
                 "GameFeatures",
+                "GFCore",
             }
         );
 
@@ -34,7 +35,6 @@ public class GCExt : ModuleRules
             new string[]
             {
                 "NetCore",
-                "GFCore",
             }
         );
 
