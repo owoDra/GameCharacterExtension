@@ -28,9 +28,9 @@ FActiveCharacterRecipe::FActiveCharacterRecipe(const UCharacterRecipe* InCDO)
 }
 
 
-void FActiveCharacterRecipe::HandleCharacterRecipeComitted(APawn* Owner, bool bHasAuthority, bool bLocallyControlled)
+void FActiveCharacterRecipe::HandleCharacterRecipeComitted(APawn* Owner, bool bHasAuthority, bool bLocallyControlled, bool bIsDedicatedServer)
 {
-	TryCreateInstance(Owner, bHasAuthority, bLocallyControlled);
+	TryCreateInstance(Owner, bHasAuthority, bLocallyControlled, bIsDedicatedServer);
 
 	UE_LOG(LogGCE_Recipes, Log, TEXT("\n[%s|%s] Committed: %s")
 		, bHasAuthority ? TEXT("SERVER") : TEXT("CLIENT")
@@ -38,33 +38,35 @@ void FActiveCharacterRecipe::HandleCharacterRecipeComitted(APawn* Owner, bool bH
 		, *GetDebugString());
 }
 
-void FActiveCharacterRecipe::TryCreateInstance(APawn* Owner, bool bHasAuthority, bool bLocallyControlled)
+void FActiveCharacterRecipe::TryCreateInstance(APawn* Owner, bool bHasAuthority, bool bLocallyControlled, bool bIsDedicatedServer)
 {
 	if (RecipeCDO && RecipeCDO->GetInstancingPolicy() == ECharacterRecipeInstancingPolicy::Instanced)
 	{
 		const auto ExecutionPolicy{ RecipeCDO->GetNetExecutionPolicy() };
-
+		
 		if ((ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::Both)
 			|| (bHasAuthority && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::ServerOnly)
 			|| (bLocallyControlled && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::LocalOnly)
-			|| ((bLocallyControlled || !bHasAuthority) && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::ClientOnly))
+			|| (!bIsDedicatedServer && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::ClientOnly))
 		{
 			RecipeInstance = NewObject<UCharacterRecipe>(Owner, RecipeCDO->GetClass());
 		}
 	}
 }
 
-void FActiveCharacterRecipe::TryExecuteSetup(APawn* Owner, UCharacterInitStateComponent* OwnerComponent, bool bHasAuthority, bool bLocallyControlled)
+void FActiveCharacterRecipe::TryExecuteSetup(APawn* Owner, UCharacterInitStateComponent* OwnerComponent, bool bHasAuthority, bool bLocallyControlled, bool bIsDedicatedServer)
 {
 	auto PawnInfo{ FCharacterRecipePawnInfo(Handle, Owner, OwnerComponent) };
 	const auto ExecutionPolicy{ RecipeCDO->GetNetExecutionPolicy() };
 
 	// Execute if possible.
 
+	const auto bIsLocallyViewd{ Owner->IsLocallyViewed() };
+
 	if ((ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::Both)
 		|| (bHasAuthority && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::ServerOnly)
 		|| (bLocallyControlled && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::LocalOnly)
-		|| ((bLocallyControlled || !bHasAuthority) && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::ClientOnly))
+		|| (!bIsDedicatedServer && ExecutionPolicy == ECharacterRecipeNetExecutionPolicy::ClientOnly))
 	{
 		if (RecipeCDO->GetInstancingPolicy() == ECharacterRecipeInstancingPolicy::Instanced)
 		{
@@ -139,12 +141,13 @@ void FActiveCharacterRecipeContainer::PostReplicatedAdd(const TArrayView<int32> 
 
 	const auto bHasAuthority{ Owner->HasAuthority() };
 	const auto bLocallyControlled{ Owner->IsLocallyControlled() };
+	const auto bIsDedicatedServer{ Owner->GetNetMode() == ENetMode::NM_DedicatedServer };
 
 	for (const auto& Index : AddedIndices)
 	{
 		auto& Entry{ Entries[Index] };
 
-		Entry.HandleCharacterRecipeComitted(Owner, bHasAuthority, bLocallyControlled);
+		Entry.HandleCharacterRecipeComitted(Owner, bHasAuthority, bLocallyControlled, bIsDedicatedServer);
 	}
 }
 
@@ -184,6 +187,7 @@ void FActiveCharacterRecipeContainer::CommitPendingCharacterRecipes()
 
 	const auto bHasAuthority{ Owner->HasAuthority() };
 	const auto bLocallyControlled{ Owner->IsLocallyControlled() };
+	const auto bIsDedicatedServer{ Owner->GetNetMode() == ENetMode::NM_DedicatedServer };
 
 	// Create an ActiveCharacterRecipe based on the CharacterRecipe class registered in PendingRecipeMap
 
@@ -194,7 +198,7 @@ void FActiveCharacterRecipeContainer::CommitPendingCharacterRecipes()
 		if (PendingRecipe)
 		{
 			auto& NewActiveRecipe{ Entries.Emplace_GetRef(PendingRecipe) };
-			NewActiveRecipe.HandleCharacterRecipeComitted(Owner, bHasAuthority, bLocallyControlled);
+			NewActiveRecipe.HandleCharacterRecipeComitted(Owner, bHasAuthority, bLocallyControlled, bIsDedicatedServer);
 
 			MarkItemDirty(NewActiveRecipe);
 		}
@@ -218,10 +222,11 @@ void FActiveCharacterRecipeContainer::ExecuteCharacterRecipeSetup()
 
 	const auto bHasAuthority{ Owner->HasAuthority() };
 	const auto bLocallyControlled{ Owner->IsLocallyControlled() };
+	const auto bIsDedicatedServer{ Owner->GetNetMode() == ENetMode::NM_DedicatedServer };
 
 	for (auto& Entry : Entries)
 	{
-		Entry.TryExecuteSetup(Owner, OwnerComponent, bHasAuthority, bLocallyControlled);
+		Entry.TryExecuteSetup(Owner, OwnerComponent, bHasAuthority, bLocallyControlled, bIsDedicatedServer);
 	}
 }
 

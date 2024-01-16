@@ -90,17 +90,17 @@ protected:
 	/**
 	 * Notify that a CharacterRecipe has been committed and an ActiveCharacterRecipe has been created.
 	 */
-	void HandleCharacterRecipeComitted(APawn* Owner, bool bHasAuthority, bool bLocallyControlled);
+	void HandleCharacterRecipeComitted(APawn* Owner, bool bHasAuthority, bool bLocallyControlled, bool bIsDedicatedServer);
 
 	/**
 	 * Create instances as needed
 	 */
-	void TryCreateInstance(APawn* Owner, bool bHasAuthority, bool bLocallyControlled);
+	void TryCreateInstance(APawn* Owner, bool bHasAuthority, bool bLocallyControlled, bool bIsDedicatedServer);
 
 	/**
 	 * Perform setup process with CharacterRecipe if possible
 	 */
-	void TryExecuteSetup(APawn* Owner, UCharacterInitStateComponent* OwnerComponent, bool bHasAuthority, bool bLocallyControlled);
+	void TryExecuteSetup(APawn* Owner, UCharacterInitStateComponent* OwnerComponent, bool bHasAuthority, bool bLocallyControlled, bool bIsDedicatedServer);
 
 	/**
 	 * Mark as finished
