@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "CharacterModifier.h"
+#include "Recipe/CharacterRecipe.h"
 
 #include "GameplayTagContainer.h"
 
-#include "CharacterModifier_SetMesh.generated.h"
+#include "CharacterRecipe_SetMesh.generated.h"
 
 class USkeletalMesh;
 class UAnimInstance;
@@ -16,14 +16,14 @@ class UAnimInstance;
  * Entry data of Mesh to be changed
  */
 USTRUCT(BlueprintType)
-struct FMeshToSetMesh
+struct GCEXT_API FMeshToSetMesh
 {
 	GENERATED_BODY()
 public:
 	FMeshToSetMesh() {}
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (Categories = "MeshType"))
 	FGameplayTag MeshTag;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (InlineEditConditionToggle))
@@ -60,20 +60,20 @@ public:
 
 
 /**
- * Modifier class to Set mesh for Pawn
+ * Recipe class to Set mesh for Pawn
  */
-UCLASS(meta = (DisplayName = "CM Set Mesh"))
-class UCharacterModifier_SetMesh final : public UCharacterModifier
+UCLASS()
+class UCharacterRecipe_SetMesh final : public UCharacterRecipe
 {
 	GENERATED_BODY()
 public:
-	UCharacterModifier_SetMesh();
+	UCharacterRecipe_SetMesh();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Set Mesh")
 	TArray<FMeshToSetMesh> MeshesToSetMesh;
 
 protected:
-	virtual bool OnApply(APawn* Pawn) const override;
+	virtual void StartSetupNonInstanced_Implementation(FCharacterRecipePawnInfo Info) const override;
 
 };

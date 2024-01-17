@@ -4,20 +4,20 @@
 
 #include "GameFeature/GameFeatureAction_WorldActionBase.h"
 
-#include "GameFeatureAction_AddCharacterData.generated.h"
+#include "GameFeatureAction_AddCharacterSet.generated.h"
 
-class UCharacterData;
+class UCharacterSet;
 
 
 /**
- * GameFeatureAction class to add specified CharacterData to CharacterDataComponent of Pawn or Character
+ * GameFeatureAction class to add specified CharacterSet to CharacterSetComponent of Pawn or Character
  */
-UCLASS(meta = (DisplayName = "GF Add Character Data"))
-class UGameFeatureAction_AddCharacterData final : public UGameFeatureAction_WorldActionBase
+UCLASS(meta = (DisplayName = "GF Add Character Set"))
+class UGameFeatureAction_AddCharacterSet final : public UGameFeatureAction_WorldActionBase
 {
 	GENERATED_BODY()
 public:
-	UGameFeatureAction_AddCharacterData() {}
+	UGameFeatureAction_AddCharacterSet() {}
 
 #if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
@@ -32,8 +32,11 @@ private:
 	TMap<FGameFeatureStateChangeContext, FPerContextData> ContextData;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "CharacterData", meta = (AssetBundles = "Client,Server"))
-	TSoftObjectPtr<const UCharacterData> CharacterData;
+	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client,Server"))
+	TSoftObjectPtr<const UCharacterSet> CharacterSet;
+
+	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client,Server"))
+	bool bCommitImmediately{ true };
 
 public:
 	virtual void OnGameFeatureActivating(FGameFeatureActivatingContext& Context) override;
@@ -44,6 +47,6 @@ public:
 private:
 	void Reset(FPerContextData& ActiveData);
 	void HandlePawnExtension(AActor* Actor, FName EventName, FGameFeatureStateChangeContext ChangeContext);
-	void AddCharacterDataForPawn(APawn* Pawn, FPerContextData& ActiveData);
+	void AddCharacterSetForPawn(APawn* Pawn, FPerContextData& ActiveData);
 
 };
