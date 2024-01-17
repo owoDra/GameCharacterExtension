@@ -46,13 +46,6 @@ void UCharacterInitStateComponent::OnRegister()
 	auto* Pawn{ GetPawn<APawn>() };
 	ensureAlwaysMsgf((Pawn != nullptr), TEXT("CharacterInitStateComponent on [%s] can only be added to Pawn actors."), *GetNameSafe(GetOwner()));
 
-	if (Pawn)
-	{
-		FScriptDelegate NewDelegate;
-		NewDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(UCharacterInitStateComponent, HandleControllerChanged));
-		Pawn->ReceiveControllerChangedDelegate.Add(NewDelegate);
-	}
-
 	ActiveCharacterRecipes.RegisterOwner(Pawn, this);
 
 	Super::OnRegister();
@@ -75,22 +68,6 @@ bool UCharacterInitStateComponent::CanChangeInitStateToDataAvailable(UGameFramew
 		return false;
 	}
 
-	// Returns false if Server or Local does not have a Controller
-
-	auto* Pawn{ GetPawnChecked<APawn>() };
-	const auto bHasAuthority{ Pawn->HasAuthority() };
-	const auto bIsLocallyControlled{ Pawn->IsLocallyControlled() };
-
-	if (bHasAuthority || bIsLocallyControlled)
-	{
-		// Check for being possessed by a controller.
-
-		if (!Pawn->GetController())
-		{
-			return false;
-		}
-	}
-
 	// Returns true if all conditions are met
 
 	return true;
@@ -105,17 +82,6 @@ void UCharacterInitStateComponent::HandleChangeInitStateToSpawned(UGameFramework
 	if (bAutoCommitCharacterRecipes)
 	{
 		CommitPendingCharacterRecipes();
-	}
-}
-
-
-void UCharacterInitStateComponent::HandleControllerChanged(APawn* Pawn, AController* OldController, AController* NewController)
-{
-	if (NewController)
-	{
-		CheckDefaultInitialization();
-
-		GetPawnChecked<APawn>()->ReceiveControllerChangedDelegate.RemoveAll(this);
 	}
 }
 

@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client,Server"))
 	TSoftObjectPtr<const UCharacterSet> CharacterSet;
 
+	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client,Server"))
+	bool bCommitImmediately{ true };
+
 public:
 	virtual void OnGameFeatureActivating(FGameFeatureActivatingContext& Context) override;
 	virtual void OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context) override;

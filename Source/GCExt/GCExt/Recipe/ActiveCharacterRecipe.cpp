@@ -32,7 +32,7 @@ void FActiveCharacterRecipe::HandleCharacterRecipeComitted(APawn* Owner, bool bH
 {
 	TryCreateInstance(Owner, bHasAuthority, bLocallyControlled, bIsDedicatedServer);
 
-	UE_LOG(LogGCE_Recipes, Log, TEXT("\n[%s|%s] Committed: %s")
+	UE_LOG(LogGCE_Recipes, Log, TEXT("[%s|%s] Committed: %s")
 		, bHasAuthority ? TEXT("SERVER") : TEXT("CLIENT")
 		, bLocallyControlled ? TEXT("Local") : TEXT("NotLocal")
 		, *GetDebugString());
@@ -112,7 +112,7 @@ void FActiveCharacterRecipe::NotifyDestroy()
 
 FString FActiveCharacterRecipe::GetDebugString()
 {
-	return FString::Printf(TEXT("[%u](CDO:%s, Instance:%s)"),
+	return FString::Printf(TEXT("[%s](CDO:%s, Instance:%s)"),
 		*Handle.ToString(), *GetNameSafe(RecipeCDO), *GetNameSafe(RecipeInstance));
 }
 
@@ -259,7 +259,7 @@ void FActiveCharacterRecipeContainer::ReleaseCharacterRecipes()
 		Entry.NotifyDestroy();
 	}
 
-	UE_LOG(LogGCE_Recipes, Log, TEXT("\n[%s] All CharacterRecipes Released"), Owner->HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
+	UE_LOG(LogGCE_Recipes, Log, TEXT("[%s] All CharacterRecipes Released"), Owner->HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
 
 	/**
 	 * This process is automatically called by the server and client during the InitState flow, 

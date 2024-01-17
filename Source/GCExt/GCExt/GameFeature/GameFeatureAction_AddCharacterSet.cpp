@@ -98,15 +98,23 @@ void UGameFeatureAction_AddCharacterSet::HandlePawnExtension(AActor* Actor, FNam
 
 void UGameFeatureAction_AddCharacterSet::AddCharacterSetForPawn(APawn* Pawn, FPerContextData& ActiveData)
 {
-	if (auto* Component{ Pawn->FindComponentByClass<UCharacterInitStateComponent>() })
+	if (Pawn->HasAuthority())
 	{
-		const auto* LoadedCharacterSet
+		if (auto* Component{ Pawn->FindComponentByClass<UCharacterInitStateComponent>() })
 		{
-			CharacterSet.IsValid() ? CharacterSet.Get() : CharacterSet.LoadSynchronous()
-		};
+			const auto* LoadedCharacterSet
+			{
+				CharacterSet.IsValid() ? CharacterSet.Get() : CharacterSet.LoadSynchronous()
+			};
 
-		TArray<FPendingCharacterRecipeHandle> DummyHundles;
-		CharacterSet->AddCharacterRecipes(Component, DummyHundles);
+			TArray<FPendingCharacterRecipeHandle> DummyHundles;
+			CharacterSet->AddCharacterRecipes(Component, DummyHundles);
+
+			if (bCommitImmediately)
+			{
+				Component->CommitPendingCharacterRecipes();
+			}
+		}
 	}
 }
 

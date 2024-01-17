@@ -37,12 +37,6 @@ protected:
 	virtual bool CanChangeInitStateToDataAvailable(UGameFrameworkComponentManager* Manager) const override;
 	virtual void HandleChangeInitStateToSpawned(UGameFrameworkComponentManager* Manager) override;
 
-	/**
-	 * Notify that the Controller has been changed.
-	 */
-	UFUNCTION()
-	virtual void HandleControllerChanged(APawn* Pawn, AController* OldController, AController* NewController);
-
 #pragma endregion
 
 
