@@ -4,4 +4,4 @@
 
 #include "Logging/LogMacros.h"
 
-GCEXT_API DECLARE_LOG_CATEGORY_EXTERN(LogGCE_Recipes, Log, All);
+GCEXT_API DECLARE_LOG_CATEGORY_EXTERN(LogGameExt_CharacterRecipe, Log, All);

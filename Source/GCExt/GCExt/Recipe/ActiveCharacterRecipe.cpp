@@ -32,7 +32,7 @@ void FActiveCharacterRecipe::HandleCharacterRecipeComitted(APawn* Owner, bool bH
 {
 	TryCreateInstance(Owner, bHasAuthority, bLocallyControlled, bIsDedicatedServer);
 
-	UE_LOG(LogGCE_Recipes, Log, TEXT("[%s|%s] Committed: %s")
+	UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("[%s|%s] Committed: %s")
 		, bHasAuthority ? TEXT("SERVER") : TEXT("CLIENT")
 		, bLocallyControlled ? TEXT("Local") : TEXT("NotLocal")
 		, *GetDebugString());
@@ -76,7 +76,7 @@ void FActiveCharacterRecipe::TryExecuteSetup(APawn* Owner, UCharacterInitStateCo
 			}
 			else
 			{
-				UE_LOG(LogGCE_Recipes, Error, TEXT("%s | Tried to execute, but no instance has been created"), *GetDebugString());
+				UE_LOG(LogGameExt_CharacterRecipe, Error, TEXT("%s | Tried to execute, but no instance has been created"), *GetDebugString());
 			}
 		}
 		else
@@ -204,7 +204,7 @@ void FActiveCharacterRecipeContainer::CommitPendingCharacterRecipes()
 		}
 		else
 		{
-			UE_LOG(LogGCE_Recipes, Error, TEXT("Invalid CharacterRecipe class was registered in PendingRecipeMap"));
+			UE_LOG(LogGameExt_CharacterRecipe, Error, TEXT("Invalid CharacterRecipe class was registered in PendingRecipeMap"));
 		}
 	}
 
@@ -259,7 +259,7 @@ void FActiveCharacterRecipeContainer::ReleaseCharacterRecipes()
 		Entry.NotifyDestroy();
 	}
 
-	UE_LOG(LogGCE_Recipes, Log, TEXT("[%s] All CharacterRecipes Released"), Owner->HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
+	UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("[%s] All CharacterRecipes Released"), Owner->HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
 
 	/**
 	 * This process is automatically called by the server and client during the InitState flow, 

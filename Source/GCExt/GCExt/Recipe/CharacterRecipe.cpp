@@ -25,21 +25,21 @@ void UCharacterRecipe::HandleStartSetup(const FCharacterRecipePawnInfo& Info)
 
 	PawnInfo = Info;
 
-	UE_LOG(LogGCE_Recipes, Log, TEXT("| [%s][Instanced] Start Setup (%s)"), *Info.Handle.ToString(), *GetNameSafe(this));
+	UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("| [%s][Instanced] Start Setup (%s)"), *Info.Handle.ToString(), *GetNameSafe(this));
 
 	StartSetup(PawnInfo);
 }
 
 void UCharacterRecipe::HandleDestroy()
 {
-	UE_LOG(LogGCE_Recipes, Log, TEXT("| [%s][Instanced] Destroy (%s)"), *PawnInfo.Handle.ToString(), *GetNameSafe(this));
+	UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("| [%s][Instanced] Destroy (%s)"), *PawnInfo.Handle.ToString(), *GetNameSafe(this));
 
 	OnDestroy();
 }
 
 void UCharacterRecipe::FinishSetup()
 {
-	UE_LOG(LogGCE_Recipes, Log, TEXT("| [%s][Instanced] Finish Setup (%s)"), *PawnInfo.Handle.ToString(), *GetNameSafe(this));
+	UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("| [%s][Instanced] Finish Setup (%s)"), *PawnInfo.Handle.ToString(), *GetNameSafe(this));
 
 	if (PawnInfo.InitStateComponent.IsValid())
 	{
@@ -61,7 +61,7 @@ void UCharacterRecipe::HandleStartSetupNonInstanced(const FCharacterRecipePawnIn
 	check(Info.InitStateComponent.IsValid());
 	check(HasAllFlags(RF_ClassDefaultObject));
 
-	UE_LOG(LogGCE_Recipes, Log, TEXT("| [%s][NonInstanced] Start Setup (%s)"), *Info.Handle.ToString(), *GetNameSafe(this));
+	UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("| [%s][NonInstanced] Start Setup (%s)"), *Info.Handle.ToString(), *GetNameSafe(this));
 
 	StartSetupNonInstanced(Info);
 

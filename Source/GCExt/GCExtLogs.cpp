@@ -2,4 +2,4 @@
 
 #include "GCExtLogs.h"
 
-DEFINE_LOG_CATEGORY(LogGCE_Recipes);
+DEFINE_LOG_CATEGORY(LogGameExt_CharacterRecipe);
