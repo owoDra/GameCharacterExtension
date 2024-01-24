@@ -12,7 +12,7 @@ class UCharacterSet;
 /**
  * GameFeatureAction class to add specified CharacterSet to CharacterSetComponent of Pawn or Character
  */
-UCLASS(meta = (DisplayName = "GF Add Character Set"))
+UCLASS(meta = (DisplayName = "Add Character Set"))
 class UGameFeatureAction_AddCharacterSet final : public UGameFeatureAction_WorldActionBase
 {
 	GENERATED_BODY()
