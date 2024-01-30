@@ -7,7 +7,7 @@
 #include "GameFeatureAction_AddCharacterSet.generated.h"
 
 class UCharacterSet;
-
+class APawn;
 
 /**
  * GameFeatureAction class to add specified CharacterSet to CharacterSetComponent of Pawn or Character
@@ -32,10 +32,16 @@ private:
 	TMap<FGameFeatureStateChangeContext, FPerContextData> ContextData;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client,Server"))
+	UPROPERTY(EditAnywhere, Category = "CharacterSet")
+	TSoftClassPtr<APawn> PawnClass;
+
+	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client, Server"))
 	TSoftObjectPtr<const UCharacterSet> CharacterSet;
 
-	UPROPERTY(EditAnywhere, Category = "CharacterSet", meta = (AssetBundles = "Client,Server"))
+	UPROPERTY(EditAnywhere, Category = "CharacterSet")
+	bool bWaitPlayerState{ false };
+
+	UPROPERTY(EditAnywhere, Category = "CharacterSet")
 	bool bCommitImmediately{ true };
 
 public:

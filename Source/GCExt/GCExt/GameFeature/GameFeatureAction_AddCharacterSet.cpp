@@ -5,8 +5,9 @@
 #include "CharacterInitStateComponent.h"
 #include "CharacterSet.h"
 
+#include "Character/GFCPawn.h"
+
 #include "Components/GameFrameworkComponentManager.h"
-#include "GameFramework/Pawn.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GameFeatureAction_AddCharacterSet)
 
@@ -17,6 +18,13 @@
 EDataValidationResult UGameFeatureAction_AddCharacterSet::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	auto Result{ CombineDataValidationResults(Super::IsDataValid(ValidationErrors), EDataValidationResult::Valid) };
+
+	if (PawnClass.IsNull())
+	{
+		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
+
+		ValidationErrors.Add(FText::FromString(TEXT("Null PawnClass has set.")));
+	}
 
 	if (CharacterSet.IsNull())
 	{
@@ -57,25 +65,26 @@ void UGameFeatureAction_AddCharacterSet::OnGameFeatureDeactivating(FGameFeatureD
 void UGameFeatureAction_AddCharacterSet::AddToWorld(const FWorldContext& WorldContext, const FGameFeatureStateChangeContext& ChangeContext)
 {
 	auto* World{ WorldContext.World() };
+	const auto bIsGameWorld{ World ? World->IsGameWorld() : false };
+
 	auto GameInstance{ WorldContext.OwningGameInstance };
+	auto* Manager{ UGameInstance::GetSubsystem<UGameFrameworkComponentManager>(GameInstance) };
+
 	auto& ActiveData{ ContextData.FindOrAdd(ChangeContext) };
 
-	if ((GameInstance != nullptr) && (World != nullptr) && World->IsGameWorld())
+	if (Manager && bIsGameWorld)
 	{
-		if (auto* Manager{ UGameInstance::GetSubsystem<UGameFrameworkComponentManager>(GameInstance) })
+		auto AddAbilitiesDelegate
 		{
-			auto AddAbilitiesDelegate
-			{ 
-				UGameFrameworkComponentManager::FExtensionHandlerDelegate::CreateUObject(this, &ThisClass::HandlePawnExtension, ChangeContext) 
-			};
+			UGameFrameworkComponentManager::FExtensionHandlerDelegate::CreateUObject(this, &ThisClass::HandlePawnExtension, ChangeContext)
+		};
 
-			auto ExtensionRequestHandle
-			{ 
-				Manager->AddExtensionHandler(APawn::StaticClass(), AddAbilitiesDelegate) 
-			};
+		auto ExtensionRequestHandle
+		{
+			Manager->AddExtensionHandler(PawnClass, AddAbilitiesDelegate)
+		};
 
-			ActiveData.ExtensionRequestHandles.Add(ExtensionRequestHandle);
-		}
+		ActiveData.ExtensionRequestHandles.Add(ExtensionRequestHandle);
 	}
 }
 
@@ -90,9 +99,19 @@ void UGameFeatureAction_AddCharacterSet::HandlePawnExtension(AActor* Actor, FNam
 	auto* AsPawn{ CastChecked<APawn>(Actor) };
 	auto& ActiveData{ ContextData.FindOrAdd(ChangeContext) };
 
-	if ((EventName == UGameFrameworkComponentManager::NAME_ExtensionAdded) || (EventName == UGameFrameworkComponentManager::NAME_GameActorReady))
+	if (bWaitPlayerState)
 	{
-		AddCharacterSetForPawn(AsPawn, ActiveData);
+		if ((EventName == UGameFrameworkComponentManager::NAME_ExtensionAdded) || (EventName == AGFCPawn::NAME_PlayerStateReady))
+		{
+			AddCharacterSetForPawn(AsPawn, ActiveData);
+		}
+	}
+	else
+	{
+		if ((EventName == UGameFrameworkComponentManager::NAME_ExtensionAdded) || (EventName == UGameFrameworkComponentManager::NAME_GameActorReady))
+		{
+			AddCharacterSetForPawn(AsPawn, ActiveData);
+		}
 	}
 }
 
