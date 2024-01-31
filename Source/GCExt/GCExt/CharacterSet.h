@@ -16,7 +16,7 @@ class UCharacterRecipe;
  * Bundle data of CharacterRecipe to be added for the character
  */
 UCLASS(BlueprintType, Const)
-class UCharacterSet : public UPrimaryDataAsset
+class GCEXT_API UCharacterSet : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
